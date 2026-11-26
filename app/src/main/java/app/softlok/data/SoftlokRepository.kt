@@ -37,9 +37,4 @@ class SoftlokRepository(private val dao: SoftlokDao) {
         dao.insertUsageIfMissing(UsageEntity(packageName, dayKey))
         dao.addExtra(packageName, dayKey, millis)
     }
-
-    suspend fun pruneUsage(keepDayKeys: Set<String>) {
-        val cutoff = keepDayKeys.minOrNull() ?: return
-        dao.pruneUsage(cutoff)
-    }
 }

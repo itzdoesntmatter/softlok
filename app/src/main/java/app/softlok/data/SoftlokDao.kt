@@ -46,7 +46,4 @@ interface SoftlokDao {
             "WHERE packageName = :packageName AND dayKey = :dayKey",
     )
     suspend fun addExtra(packageName: String, dayKey: String, millis: Long)
-
-    @Query("DELETE FROM usage WHERE dayKey < :cutoffDayKey")
-    suspend fun pruneUsage(cutoffDayKey: String)
 }

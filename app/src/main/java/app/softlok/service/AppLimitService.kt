@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.SystemClock
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.content.ContextCompat
 import app.softlok.MainActivity
@@ -16,6 +17,7 @@ import app.softlok.data.SoftlokRepository
 import app.softlok.data.RuleEntity
 import app.softlok.data.SecurityStore
 import app.softlok.domain.TimeText
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -90,7 +92,16 @@ class AppLimitService : AccessibilityService() {
             ContextCompat.RECEIVER_EXPORTED,
         )
         scope.launch {
-            events.collect { packageName -> handleForeground(packageName) }
+            events.collect { packageName ->
+                try {
+                    handleForeground(packageName)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (error: Exception) {
+                    // A single failed event must not stop enforcement.
+                    Log.w(TAG, "foreground event failed: ${error.javaClass.simpleName}")
+                }
+            }
         }
     }
 
@@ -187,42 +198,51 @@ class AppLimitService : AccessibilityService() {
     private fun startTicker(rule: RuleEntity) {
         tickerJob?.cancel()
         tickerJob = scope.launch {
-            while (isActive) {
-                var waitMillis = CHECKPOINT_MILLIS
-                var limitReached = false
-                mutex.withLock {
-                    val packageName = activePackage ?: return@launch
-                    if (packageName != rule.packageName) return@launch
-                    flushLocked(SystemClock.elapsedRealtime())
+            try {
+                while (isActive) {
+                    var waitMillis = CHECKPOINT_MILLIS
+                    var limitReached = false
+                    mutex.withLock {
+                        val packageName = activePackage ?: return@launch
+                        if (packageName != rule.packageName) return@launch
+                        flushLocked(SystemClock.elapsedRealtime())
 
-                    // Shortcut: a session that crosses midnight counts up to one checkpoint
-                    // toward the previous day. Revisit if exact midnight attribution matters.
-                    val dayKey = TimeText.dayKey(System.currentTimeMillis())
-                    if (dayKey != activeDayKey) activeDayKey = dayKey
-                    val usage = repository.usageFor(packageName, dayKey)
-                    val remaining = TimeText.remaining(
-                        rule.dailyLimitMillis,
-                        usage.usedMillis,
-                        usage.extraMillis,
-                    )
-                    if (remaining <= 0) {
-                        stopTrackingLocked()
-                        limitReached = true
-                    } else {
-                        waitMillis = minOf(remaining, CHECKPOINT_MILLIS)
+                        // Shortcut: a session that crosses midnight counts up to one checkpoint
+                        // toward the previous day. Revisit if exact midnight attribution matters.
+                        val dayKey = TimeText.dayKey(System.currentTimeMillis())
+                        if (dayKey != activeDayKey) activeDayKey = dayKey
+                        val usage = repository.usageFor(packageName, dayKey)
+                        val remaining = TimeText.remaining(
+                            rule.dailyLimitMillis,
+                            usage.usedMillis,
+                            usage.extraMillis,
+                        )
+                        if (remaining <= 0) {
+                            stopTrackingLocked()
+                            limitReached = true
+                        } else {
+                            waitMillis = minOf(remaining, CHECKPOINT_MILLIS)
+                        }
                     }
-                }
-                if (limitReached) {
-                    val usage = repository.usageFor(
-                        rule.packageName,
-                        TimeText.dayKey(System.currentTimeMillis()),
-                    )
-                    withContext(Dispatchers.Main) {
-                        showBlock(rule, usage.usedMillis, usage.extraMillis)
+                    if (limitReached) {
+                        val usage = repository.usageFor(
+                            rule.packageName,
+                            TimeText.dayKey(System.currentTimeMillis()),
+                        )
+                        withContext(Dispatchers.Main) {
+                            showBlock(rule, usage.usedMillis, usage.extraMillis)
+                        }
+                        return@launch
                     }
-                    return@launch
+                    delay(waitMillis)
                 }
-                delay(waitMillis)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Log.w(TAG, "ticker failed: ${error.javaClass.simpleName}")
+                mutex.withLock {
+                    if (activePackage == rule.packageName) stopTrackingLocked()
+                }
             }
         }
     }
@@ -246,7 +266,7 @@ class AppLimitService : AccessibilityService() {
     private fun showBlock(rule: RuleEntity, usedMillis: Long, extraMillis: Long) {
         if (overlay != null) return
         blockedPackage = rule.packageName
-        overlay = BlockOverlay(
+        val candidate = BlockOverlay(
             context = this,
             rule = rule,
             usedMillis = usedMillis,
@@ -279,7 +299,14 @@ class AppLimitService : AccessibilityService() {
                 performGlobalAction(GLOBAL_ACTION_HOME)
                 dismissOverlay()
             },
-        ).also { it.show() }
+        )
+        val shown = candidate.show()
+        overlay = if (shown) candidate else null
+        if (!shown) {
+            Log.w(TAG, "block overlay failed")
+            blockedPackage = null
+            performGlobalAction(GLOBAL_ACTION_HOME)
+        }
     }
 
     private fun dismissOverlay() {
@@ -289,6 +316,7 @@ class AppLimitService : AccessibilityService() {
     }
 
     companion object {
+        private const val TAG = "SoftlokLimit"
         private const val CHECKPOINT_MILLIS = 15_000L
     }
 }

@@ -4,7 +4,6 @@ package app.softlok.service
 
 import android.accessibilityservice.AccessibilityService
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -56,7 +55,7 @@ class BlockOverlay(
     private lateinit var showCode: CheckBox
     private lateinit var errorText: TextView
     private lateinit var recoveryText: TextView
-    private lateinit var recoveryButton: Button
+    private lateinit var recoveryButton: TextView
     private val extensionButtons = mutableListOf<Button>()
     private var busy = false
     private var recoveryReady = false
@@ -71,10 +70,9 @@ class BlockOverlay(
     private val fieldColor = if (night) 0xFF1B2321.toInt() else 0xFFFFFFFF.toInt()
     private val errorColor = if (night) 0xFFFFB4AB.toInt() else 0xFFB3261E.toInt()
 
-    fun show() {
-        if (root != null) return
+    fun show(): Boolean {
+        if (root != null) return true
         val view = build()
-        root = view
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -91,10 +89,20 @@ class BlockOverlay(
                     WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
             }
         }
-        windowManager.addView(view, params)
-        scope.launch {
-            val state = securityStore.state.first()
-            withContext(Dispatchers.Main) { renderRecovery(state, System.currentTimeMillis()) }
+        return try {
+            windowManager.addView(view, params)
+            root = view
+            scope.launch {
+                val state = securityStore.state.first()
+                withContext(Dispatchers.Main) {
+                    renderRecovery(state, System.currentTimeMillis())
+                }
+            }
+            true
+        } catch (error: Exception) {
+            root = null
+            runCatching { windowManager.removeView(view) }
+            false
         }
     }
 
@@ -235,12 +243,14 @@ class BlockOverlay(
 
         recoveryText = label("", 13f, muted, Typeface.NORMAL)
         column.addView(recoveryText, matchWidth(top = 16))
-        recoveryButton = Button(context).apply {
+        recoveryButton = TextView(context).apply {
             textSize = 13f
-            isAllCaps = false
             setTextColor(accent)
-            backgroundTintList =
-                android.content.res.ColorStateList.valueOf(Color.TRANSPARENT)
+            gravity = Gravity.CENTER
+            minHeight = dp(48)
+            isClickable = true
+            isFocusable = true
+            setPadding(dp(8), dp(8), dp(8), dp(8))
             setOnClickListener { handleRecovery() }
         }
         column.addView(recoveryButton, buttonParams(top = 0, height = 48))
