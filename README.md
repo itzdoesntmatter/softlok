@@ -6,6 +6,9 @@ Per-app daily screen-time limits with a long override code and a deliberate reco
 
 Softlok is a local-only Android app. Pick the apps that eat your day, give each one a daily allowance, and set a long random code you will not remember. When the allowance runs out, a full-screen block appears. Extra time costs the code, so the easy path is to close the app.
 
+> [!WARNING]
+> **Completely vibe-coded:** Softlok was built entirely by AI from conversational prompts, without a line-by-line human review or a security audit. It requests accessibility access, so read the code and test it yourself before trusting it. See [DISCLAIMER.md](DISCLAIMER.md).
+
 > **Status:** early development. Core flows pass unit tests, lint, and a Compose UI test on an Android 16 emulator. Physical-device testing across OEMs is still needed.
 
 ## Features

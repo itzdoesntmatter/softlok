@@ -1,5 +1,7 @@
 # Security policy
 
+> **Note:** Softlok is vibe-coded and has not received an independent security audit. See [DISCLAIMER.md](DISCLAIMER.md).
+
 ## Reporting
 
 Report vulnerabilities privately through GitHub Security Advisories on this repository. Do not open a public issue for a bypass or a code-handling flaw.
