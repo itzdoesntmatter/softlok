@@ -9,7 +9,7 @@
     </queries>
 
     <application
-        android:name=".OverplayApp"
+        android:name=".SoftlokApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Overplay">
+        android:theme="@style/Theme.Softlok">
 
         <activity
             android:name=".MainActivity"

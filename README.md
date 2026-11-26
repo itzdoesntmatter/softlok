@@ -1,10 +1,10 @@
-# Overplay
+# Softlok
 
 Per-app daily screen-time limits with a long override code and a deliberate recovery delay.
 
-[Source](https://github.com/itzdoesntmatter/overplay) · [Issues](https://github.com/itzdoesntmatter/overplay/issues) · [Threat model](docs/THREAT-MODEL.md)
+[Source](https://github.com/itzdoesntmatter/softlok) · [Issues](https://github.com/itzdoesntmatter/softlok/issues) · [Threat model](docs/THREAT-MODEL.md)
 
-Overplay is a local-only Android app. Pick the apps that eat your day, give each one a daily allowance, and set a long random code you will not remember. When the allowance runs out, a full-screen block appears. Extra time costs the code, so the easy path is to close the app.
+Softlok is a local-only Android app. Pick the apps that eat your day, give each one a daily allowance, and set a long random code you will not remember. When the allowance runs out, a full-screen block appears. Extra time costs the code, so the easy path is to close the app.
 
 > **Status:** early development. Core flows pass unit tests, lint, and a Compose UI test on an Android 16 emulator. Physical-device testing across OEMs is still needed.
 
@@ -19,7 +19,7 @@ Overplay is a local-only Android app. Pick the apps that eat your day, give each
 
 ## Permissions
 
-Overplay needs one special Android permission and explains it in the app before use:
+Softlok needs one special Android permission and explains it in the app before use:
 
 - **Accessibility** detects the foreground package and draws the block overlay.
 
@@ -35,7 +35,7 @@ An ordinary Android app cannot stop its owner from:
 - force-stopping it
 - changing the device clock, which affects recovery timing
 
-Overplay is friction, not an unbreakable lock. See [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) for the full list.
+Softlok is friction, not an unbreakable lock. See [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) for the full list.
 
 Accessibility-based blockers also face Google Play policy requirements. Initial releases target GitHub and F-Droid.
 
@@ -60,7 +60,7 @@ The debug APK is written to `app/build/outputs/apk/debug/`. Release builds are m
 ## Project layout
 
 ```text
-app/src/main/java/app/overplay/
+app/src/main/java/app/softlok/
 ├── data/       Room rules and usage, DataStore security state
 ├── domain/     code hashing, limits, time formatting
 ├── service/    accessibility monitor and block overlay

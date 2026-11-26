@@ -1,12 +1,12 @@
 name: Feature request
-description: Suggest a change to Overplay
+description: Suggest a change to Softlok
 labels: [enhancement]
 body:
   - type: textarea
     id: problem
     attributes:
       label: Problem
-      description: What are you trying to do that Overplay makes hard?
+      description: What are you trying to do that Softlok makes hard?
     validations:
       required: true
   - type: textarea

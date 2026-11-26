@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Overplay"
+rootProject.name = "Softlok"
 include(":app")

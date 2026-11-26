@@ -1,6 +1,6 @@
 # Threat model
 
-Overplay is a self-control tool. It is designed to make impulsive bypassing inconvenient, not to resist a determined owner of the device.
+Softlok is a self-control tool. It is designed to make impulsive bypassing inconvenient, not to resist a determined owner of the device.
 
 ## Assets
 
@@ -14,8 +14,8 @@ Overplay is a self-control tool. It is designed to make impulsive bypassing inco
 | --- | --- | --- |
 | The device owner in a hurry | Close the block, open settings | Must enter the code to add time or weaken a rule |
 | The device owner with patience | Uninstall, clear data, revoke permissions, force stop | Protection ends; data is lost |
-| Another app | Read Overplay data | Blocked by Android app sandboxing |
-| A network attacker | Intercept data | Nothing to intercept; Overplay has no network permission |
+| Another app | Read Softlok data | Blocked by Android app sandboxing |
+| A network attacker | Intercept data | Nothing to intercept; Softlok has no network permission |
 | Someone with physical access | Use the device, change the clock | Can bypass unless the owner also controls the device's security |
 
 ## Mitigations
@@ -26,7 +26,7 @@ Overplay is a self-control tool. It is designed to make impulsive bypassing inco
 - Recovery waits 48 hours. Protection stays active during the wait, and the deadline is persisted.
 - The code is shown once and must be typed back before it is saved.
 - Database backups are disabled; rules and usage do not leave the device.
-- Overplay has no `INTERNET` permission.
+- Softlok has no `INTERNET` permission.
 
 ## Known bypasses
 

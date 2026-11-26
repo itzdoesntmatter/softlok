@@ -1,6 +1,6 @@
 # Privacy
 
-Overplay stores everything on the device.
+Softlok stores everything on the device.
 
 - No account or sign-in
 - No analytics, crash reporting, advertising, or telemetry
@@ -19,8 +19,8 @@ The accessibility service reads only the package name of the app in the foregrou
 
 ## Retention and deletion
 
-Usage rows are kept only as long as needed for day-boundary handling. Clearing Android app data or uninstalling Overplay deletes all stored data.
+Usage rows are kept only as long as needed for day-boundary handling. Clearing Android app data or uninstalling Softlok deletes all stored data.
 
 ## Android backup
 
-Backups are disabled for Overplay so rules and security state do not leave the device through Google backup or device transfer.
+Backups are disabled for Softlok so rules and security state do not leave the device through Google backup or device transfer.

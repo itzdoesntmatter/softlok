@@ -1,5 +1,5 @@
 name: Bug report
-description: Something in Overplay is broken
+description: Something in Softlok is broken
 labels: [bug]
 body:
   - type: markdown

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "app.overplay"
+    namespace = "app.softlok"
     compileSdk {
         version = release(37) {
             minorApiLevel = 2
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "app.overplay"
+        applicationId = "app.softlok"
         minSdk = 26
         targetSdk = 37
         versionCode = 1

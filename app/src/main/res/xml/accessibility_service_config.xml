@@ -8,5 +8,5 @@
     android:description="@string/accessibility_service_description"
     android:isAccessibilityTool="false"
     android:notificationTimeout="100"
-    android:settingsActivity="app.overplay.MainActivity"
+    android:settingsActivity="app.softlok.MainActivity"
     tools:targetApi="31" />
