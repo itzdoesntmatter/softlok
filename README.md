@@ -58,7 +58,7 @@ Requirements:
 ./gradlew :app:lintDebug
 ```
 
-The debug APK is written to `app/build/outputs/apk/debug/`. Release builds are minified with R8 and need a private signing key that is not committed.
+The debug APK is written to `app/build/outputs/apk/debug/`. For signed releases, see [docs/RELEASING.md](docs/RELEASING.md).
 
 ## Project layout
 
