@@ -6,6 +6,7 @@ import android.app.Application
 import android.content.Context
 import app.softlok.data.SoftlokDatabase
 import app.softlok.data.SoftlokRepository
+import app.softlok.data.ScreenTimeTracker
 import app.softlok.data.SecurityStore
 import app.softlok.data.securityDataStore
 
@@ -23,4 +24,5 @@ class AppContainer(context: Context) {
     private val database = SoftlokDatabase.get(context)
     val repository = SoftlokRepository(database.dao())
     val securityStore = SecurityStore(context.securityDataStore)
+    val screenTimeTracker = ScreenTimeTracker(context)
 }

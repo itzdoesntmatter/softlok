@@ -139,7 +139,7 @@ fun SettingsScreen(
 
             SettingCard("Permissions") {
                 Text(
-                    "Accessibility access must stay on for limits to work.",
+                    "Accessibility blocks apps. Usage access only powers screen-time stats.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -149,6 +149,13 @@ fun SettingsScreen(
                     granted = state.permissions.accessibility,
                     onOpen = {
                         context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    },
+                )
+                PermissionSettingRow(
+                    name = "Usage access",
+                    granted = state.permissions.usageAccess,
+                    onOpen = {
+                        context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
                     },
                 )
                 Spacer(Modifier.height(8.dp))

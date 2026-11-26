@@ -32,6 +32,7 @@ Softlok is a self-control tool. It is designed to make impulsive bypassing incon
 
 - Uninstalling the app or clearing its data resets everything.
 - Disabling the accessibility service stops enforcement.
+- Disabling usage access hides screen-time stats but does not stop enforcement.
 - Force-stopping the app stops enforcement until Android restarts the service.
 - Changing the system clock can shorten the recovery wait or affect day boundaries.
 - A rooted or device-owner-controlled device can bypass any app-level restriction.

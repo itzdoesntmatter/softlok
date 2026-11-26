@@ -35,8 +35,9 @@ import kotlinx.coroutines.withContext
 
 data class PermissionState(
     val accessibility: Boolean = false,
+    val usageAccess: Boolean = false,
 ) {
-    val allGranted: Boolean get() = accessibility
+    val allGranted: Boolean get() = accessibility && usageAccess
 }
 
 data class RuleUi(
@@ -52,6 +53,7 @@ data class DashboardUiState(
     val security: SecurityState = SecurityState(),
     val permissions: PermissionState = PermissionState(),
     val dayKey: String = "",
+    val screenTimeMillis: Map<String, Long> = emptyMap(),
 )
 
 data class InstalledApp(
@@ -66,7 +68,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val container = (application as SoftlokApp).container
     private val repository = container.repository
     private val securityStore = container.securityStore
+    private val screenTimeTracker = container.screenTimeTracker
     private val permissions = MutableStateFlow(readPermissions())
+    private val screenTimeRefresh = MutableStateFlow(0)
 
     private val dayKeys = flow {
         while (true) {
@@ -77,13 +81,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val usage = dayKeys.flatMapLatest { repository.usage(it) }
 
-    val uiState: StateFlow<DashboardUiState> = combine(
+    private val screenTime = combine(
         repository.rules,
-        usage,
-        securityStore.state,
         permissions,
         dayKeys,
-    ) { rules, usageRows, security, permissionState, dayKey ->
+        screenTimeRefresh,
+    ) { rules, permissionState, _, _ ->
+        if (!permissionState.usageAccess) {
+            emptyMap()
+        } else {
+            screenTimeTracker.todayUsage(rules.map { it.packageName }.toSet())
+        }
+    }
+
+    val uiState: StateFlow<DashboardUiState> = combine(
+        combine(repository.rules, usage, securityStore.state) { rules, usageRows, security ->
+            Triple(rules, usageRows, security)
+        },
+        permissions,
+        dayKeys,
+        screenTime,
+    ) { (rules, usageRows, security), permissionState, dayKey, screenTimeMillis ->
         val usageByPackage = usageRows.associateBy { it.packageName }
         val ruleRows = rules.map { rule ->
             val row = usageByPackage[rule.packageName]
@@ -102,6 +120,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             security = security,
             permissions = permissionState,
             dayKey = dayKey,
+            screenTimeMillis = screenTimeMillis,
         )
     }.stateIn(
         viewModelScope,
@@ -115,6 +134,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refresh() {
         permissions.value = readPermissions()
+        screenTimeRefresh.value += 1
         viewModelScope.launch {
             securityStore.completeRecoveryIfDue(System.currentTimeMillis())
         }
@@ -205,6 +225,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val context = getApplication<Application>()
         return PermissionState(
             accessibility = hasAccessibility(context),
+            usageAccess = screenTimeTracker.hasUsageAccess(),
         )
     }
 

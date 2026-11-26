@@ -43,6 +43,7 @@ fun HomeScreen(
     onAddApps: () -> Unit,
     onEdit: (String) -> Unit,
     onSetCode: () -> Unit,
+    onScreenTime: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -91,6 +92,17 @@ fun HomeScreen(
             }
 
             item {
+                ScreenTimeSummaryCard(
+                    granted = state.permissions.usageAccess,
+                    totalMillis = state.rules.sumOf {
+                        state.screenTimeMillis[it.rule.packageName] ?: 0L
+                    },
+                    appCount = state.rules.size,
+                    onClick = onScreenTime,
+                )
+            }
+
+            item {
                 Text(
                     "Today",
                     style = MaterialTheme.typography.titleLarge,
@@ -132,6 +144,47 @@ fun HomeScreen(
                     Text("Add app")
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ScreenTimeSummaryCard(
+    granted: Boolean,
+    totalMillis: Long,
+    appCount: Int,
+    onClick: () -> Unit,
+) {
+    Card(modifier = Modifier.clickable(onClick = onClick)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    "Screen time today",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    if (granted) {
+                        "${TimeText.clock(totalMillis)} across $appCount " +
+                            if (appCount == 1) "app" else "apps"
+                    } else {
+                        "Grant usage access to see Android screen time."
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(
+                "View",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }
@@ -192,13 +245,13 @@ private fun PermissionCard(permissions: PermissionState) {
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(
-                "Keep limits working",
+                "Permissions",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Softlok needs accessibility access to see the active app.",
+                "Accessibility blocks apps. Usage access shows Android screen time.",
                 style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(Modifier.height(12.dp))
@@ -207,6 +260,14 @@ private fun PermissionCard(permissions: PermissionState) {
                 granted = permissions.accessibility,
                 onOpen = {
                     context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                },
+            )
+            Spacer(Modifier.height(6.dp))
+            PermissionRow(
+                name = "Usage access",
+                granted = permissions.usageAccess,
+                onOpen = {
+                    context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
                 },
             )
         }

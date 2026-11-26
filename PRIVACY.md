@@ -15,7 +15,7 @@ Softlok stores everything on the device.
 - A salted hash of the override code, never the code itself
 - Recovery deadline and failed-attempt counters
 
-The accessibility service reads only the package name of the app in the foreground. Window content, text, and keystrokes are not accessed.
+The accessibility service reads only the package name of the app in the foreground. For the Screen time view, Softlok reads Android's foreground usage events for the apps you limit. Window content, text, and keystrokes are not accessed. Both are processed on the device.
 
 ## Retention and deletion
 

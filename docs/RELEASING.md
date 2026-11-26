@@ -45,9 +45,9 @@ $ANDROID_HOME/build-tools/36.0.0/apksigner verify --print-certs \
 ## Publish
 
 ```sh
-gh release create v0.1.0 \
-  app/build/outputs/apk/release/app-release.apk#softlok-0.1.0.apk \
-  --title "Softlok v0.1.0" \
+gh release create v0.2.0 \
+  app/build/outputs/apk/release/app-release.apk#softlok-0.2.0.apk \
+  --title "Softlok v0.2.0" \
   --notes-file release-notes.md \
   --prerelease
 ```

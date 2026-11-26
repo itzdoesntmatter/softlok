@@ -52,6 +52,12 @@ fun SoftlokRoot(viewModel: MainViewModel = viewModel()) {
                 },
             )
 
+            route == "screentime" -> ScreenTimeScreen(
+                state = state,
+                onBack = { route = "home" },
+                onRefresh = viewModel::refresh,
+            )
+
             route == "settings" -> SettingsScreen(
                 state = state,
                 onBack = { route = "home" },
@@ -109,6 +115,7 @@ fun SoftlokRoot(viewModel: MainViewModel = viewModel()) {
                 onAddApps = { route = "picker" },
                 onEdit = { packageName -> route = "edit/${Uri.encode(packageName)}" },
                 onSetCode = { route = "code" },
+                onScreenTime = { route = "screentime" },
             )
         }
     }

@@ -15,6 +15,7 @@ Softlok is a local-only Android app. Pick the apps that eat your day, give each 
 
 - Per-app daily limits, reset at local midnight
 - Full-screen block when an app reaches its allowance
+- Today's Android screen time for each limited app
 - App-generated 24-digit override code, stored only as a salted PBKDF2 hash
 - Extra time in 5, 15, 30, or 60 minute steps
 - 48-hour delayed code recovery if you forget it
@@ -22,11 +23,12 @@ Softlok is a local-only Android app. Pick the apps that eat your day, give each 
 
 ## Permissions
 
-Softlok needs one special Android permission and explains it in the app before use:
+Softlok uses two Android permissions with separate jobs:
 
 - **Accessibility** detects the foreground package and draws the block overlay.
+- **Usage access** reads Android's per-app foreground usage for the Screen time view.
 
-The accessibility service is configured with `canRetrieveWindowContent="false"`. It reads package names only, never screen content, text, or keystrokes. Android does not let a normal app enforce limits without this capability.
+The accessibility service is configured with `canRetrieveWindowContent="false"`. It reads package names only, never screen content, text, or keystrokes. Usage access is read-only and does not affect blocking. Android does not let a normal app enforce limits without accessibility.
 
 ## Limitations
 
